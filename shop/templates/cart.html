@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Cart</h1>
+    <ul class="list-group">
+        {% for product in products %}
+            <li class="list-group-item disabled">{{ product.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
