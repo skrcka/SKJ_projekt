@@ -20,8 +20,8 @@ def cart(request):
 
 
 @login_required(login_url="/users/login")
-def cart_add(request, id):
-    cart = CartItem.objects.filter(user_id=request.user.id)
+def cart_add(request, id, count):
+    CartItem.objects.update_or_create(product_id=id, user_id=request.user.id, defaults={count: 10})
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 

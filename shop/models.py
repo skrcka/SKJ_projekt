@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
 
 class Product(models.Model):
@@ -9,6 +10,6 @@ class Product(models.Model):
 
 
 class CartItem(models.Model):
-    user_id=models.IntegerField(default=-1)
-    product=models.ManyToManyField(Product,blank=True)
-    count=models.IntegerField(default=1)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, default=0)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, default=0)
+    count = models.IntegerField(default=0)
