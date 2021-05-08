@@ -16,10 +16,14 @@ class CartItem(models.Model):
 class DeliveryService(models.Model):
     name = models.CharField(max_length=255)
     price = models.FloatField()
+    def __str__(self):
+        return f'{self.name}({self.price})'
 
 class PaymentMethod(models.Model):
     name = models.CharField(max_length=255)
     desc = models.CharField(max_length=255)
+    def __str__(self):
+        return f'{self.name}'
 
 class Order(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, default=0)

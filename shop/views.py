@@ -7,6 +7,9 @@ from django.contrib.auth import authenticate, login
 from .models import Product
 from .models import CartItem
 from .forms import LoginForm
+from .forms import OrderForm
+from .forms import CartItemForm
+from .forms import CartItemFormSet
 from django.contrib.auth import get_user_model
 
 
@@ -33,6 +36,16 @@ def login_view(request):
 
     return render(request, 'login.html', {'form': form})
 
+def order_new(request):
+    cart = CartItem.objects.filter(user_id=request.user.id)
+    if request.method == 'POST':
+        for item in cart:
+            request.POST['']
+        model_instance = form.save(commit=False)
+    else:
+        form = OrderForm()
+        return render(request, 'order_new.html', {'form': form, 'cart': cart})
+
 def logout_view(request):
     logout(request)
     return redirect('/shop')
@@ -45,26 +58,34 @@ def product(request, id):
 
 @login_required
 def cart(request):
-    cart = CartItem.objects.filter(user_id=request.user.id)
+    if request.method == 'POST':
+        form = CartItemFormSet(request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        form = CartItemFormSet(queryset=CartItem.objects.filter(user_id=request.user.id))
     return render(request, 'cart.html', 
-                    {'cart': cart})
+                    {'form': form})
 
+@login_required
+def orders_view(request):
+    orders = Order.objects.filter(user_id=request.user.id)
+    return render(request, 'orders.html', 
+                    {'orders': orders})
 
 @login_required
 def cart_add(request, id, count):
     CartItem.objects.update_or_create(product_id=id, user_id=request.user.id, count=count)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-
 @login_required
-def item_clear(request, id):
-    cart = CartItem.objects.filter(user_id=request.user.id)
-    return render(request, 'cart.html', 
-                    {'cart': cart})
+def cart_remove(request, id):
+    CartItem.objects.filter(id=id, user_id=request.user.id).delete()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
 def cart_clear(request):
-    cart = CartItem.objects.filter(user_id=request.user.id)
+    cart = CartItem.objects.filter(user_id=request.user.id).delete()
     return render(request, 'cart.html', 
                     {'cart': cart})
