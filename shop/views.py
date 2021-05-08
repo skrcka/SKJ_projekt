@@ -6,17 +6,35 @@ from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from .models import Product
 from .models import CartItem
+from .models import OrderItem
+from .models import Order
 from .forms import LoginForm
 from .forms import OrderForm
+from .forms import SignUpForm
 from .forms import CartItemForm
 from .forms import CartItemFormSet
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 
 
 def index(request):
     products = Product.objects.all()
     return render(request, 'index.html', 
                     {'products': products})
+
+def sign_up(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        email = request.POST['email']
+        user = User.objects.create_user(username=username,
+                                 email=email,
+                                 password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/shop')
+    form = SignUpForm(request.POST)
+    return render(request, 'sign_up.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -36,15 +54,27 @@ def login_view(request):
 
     return render(request, 'login.html', {'form': form})
 
+@login_required
 def order_new(request):
     cart = CartItem.objects.filter(user_id=request.user.id)
     if request.method == 'POST':
-        for item in cart:
-            request.POST['']
-        model_instance = form.save(commit=False)
-    else:
-        form = OrderForm()
-        return render(request, 'order_new.html', {'form': form, 'cart': cart})
+        form = OrderForm(request.POST, )
+        if form.is_valid():
+            order = form.save(commit=False)
+            order.user = request.user
+            order.save()
+            oid = Order.objects.filter(user_id=request.user.id).last().id
+            cartitems = CartItem.objects.filter(user_id=request.user.id)
+            for item in cartitems:
+                orderitem = OrderItem()
+                orderitem.product = item.product
+                orderitem.count = item.count
+                orderitem.order = order
+                orderitem.save()
+            cartitems.delete()
+            return redirect('/shop')
+    form = OrderForm()
+    return render(request, 'order_new.html', {'form': form, 'cart': cart})
 
 def logout_view(request):
     logout(request)
@@ -55,6 +85,12 @@ def product(request, id):
     return render(request, 'product.html', 
                     {'p': p})
 
+@login_required
+def order_detail(request, id):
+    o = Order.objects.filter(id=id).first()
+    ois = OrderItem.objects.filter(order_id=id)
+    return render(request, 'order_detail.html', 
+                    {'o': o, 'ois': ois})
 
 @login_required
 def cart(request):

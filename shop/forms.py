@@ -9,10 +9,20 @@ class LoginForm(forms.ModelForm):
         model = get_user_model()
         fields = ['username', 'password']
 
+class SignUpForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'password', 'email']
+
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['payment_method', 'delivery_service', 'street', 'city', 'country', 'psc', 'note']
+    def __init__(self, *args, **kwargs):
+        super(OrderForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
 class CartItemForm(forms.ModelForm):
     class Meta:

@@ -3,9 +3,9 @@
     <h1>Products</h1>
     <div class='row'>
         {% for product in products %}
-        <div class='col'>
+        <div class='col-sm-12 col-md-4'>
             <div class="card" style="width: 18rem;">
-                <img src="{{ product.image_url }}" class="card-img-top" alt="...">
+                <img src="{{ product.image_url }}" height="200" class="card-img-top" alt="...">
                 <div class="card-body">
                     <a href="{% url 'product' product.id %}"><h5 class="card-title">{{ product.name }}</h5></a>
                     <p class="card-text">{{ product.price }} Kc</p>
