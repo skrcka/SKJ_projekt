@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
     <h1>Products</h1>
+    {% if user.is_staff %}
+    <p><a class="btn btn-primary" href="{% url 'product_new' %}">New</a></p>
+    {% endif %}
     <div class='row'>
         {% for product in products %}
         <div class='col-sm-12 col-md-4'>

@@ -112,6 +112,19 @@ def product_edit(request, id):
     return render(request, 'product_edit.html', 
                     {'form': form})
 
+@staff_member_required(login_url='/shop/login')
+def product_new(request):
+    if request.method == 'POST':
+        form = ProductEditForm(request.POST)
+        if form.is_valid():
+            item = form.save()
+            iid = Product.objects.all().last().id
+            return redirect(f'/shop/product/{iid}')
+    else:
+        form = ProductEditForm()
+    return render(request, 'product_new.html', 
+                    {'form': form})
+
 @login_required
 def order_detail(request, id):
     o = Order.objects.filter(id=id).first()
