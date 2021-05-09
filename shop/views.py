@@ -13,8 +13,10 @@ from .forms import OrderForm
 from .forms import SignUpForm
 from .forms import CartItemForm
 from .forms import CartItemFormSet
+from .forms import UserEditForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 def index(request):
@@ -33,7 +35,9 @@ def sign_up(request):
         if user is not None:
             login(request, user)
             return redirect('/shop')
-    form = SignUpForm(request.POST)
+        form = SignUpForm(request.POST)
+    else:
+        form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
 
 def login_view(request):
@@ -91,6 +95,36 @@ def order_detail(request, id):
     ois = OrderItem.objects.filter(order_id=id)
     return render(request, 'order_detail.html', 
                     {'o': o, 'ois': ois})
+
+@login_required
+def account_detail(request):
+    if request.method == 'POST':
+        form = UserEditForm(request.POST, instance=request.user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+            return redirect('/shop/myaccount')
+    else:
+        form = UserEditForm(instance=request.user)
+    return render(request, 'account_detail.html', 
+                    {'form': form})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('change_password')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {
+        'form': form
+    })
 
 @login_required
 def cart(request):
