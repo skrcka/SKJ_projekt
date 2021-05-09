@@ -6,5 +6,6 @@
     <p>In stock: {{ p.stock }}</p>
     {% if user.is_staff %}
     <p><a class="btn btn-primary" href="{% url 'product_edit' p.id %}">Edit</a></p>
+    <p><a class="btn btn-primary" href="{% url 'product_delete' p.id %}">Delete</a></p>
     {% endif %}
     {% endblock %}

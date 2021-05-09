@@ -179,6 +179,10 @@ def cart_remove(request, id):
     CartItem.objects.filter(id=id, user_id=request.user.id).delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@staff_member_required(login_url='/shop/login')
+def product_delete(request, id):
+    Product.objects.filter(id=id).delete()
+    return redirect('/shop')
 
 @login_required
 def cart_clear(request):
