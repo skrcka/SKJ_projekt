@@ -2,4 +2,5 @@
 {% block content %}
     <h1>{{ p.name }}</h1>
     <p>{{ p.price }} Kc</p>
+    <p><a class="btn btn-primary" href="{% url 'product_edit' p.id %}">Edit</a></p>
 {% endblock %}

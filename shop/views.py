@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from .models import Product
@@ -14,9 +15,10 @@ from .forms import SignUpForm
 from .forms import CartItemForm
 from .forms import CartItemFormSet
 from .forms import UserEditForm
+from .forms import PasswordChangeCustomForm
+from .forms import ProductEditForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordChangeForm
 
 
 def index(request):
@@ -62,7 +64,7 @@ def login_view(request):
 def order_new(request):
     cart = CartItem.objects.filter(user_id=request.user.id)
     if request.method == 'POST':
-        form = OrderForm(request.POST, )
+        form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
             order.user = request.user
@@ -90,6 +92,20 @@ def product(request, id):
                     {'p': p})
 
 @login_required
+def product_edit(request, id):
+    if request.method == 'POST':
+        form = ProductEditForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.id = id
+            item.save()
+            return redirect(f'/shop/product/{id}/edit')
+    else:
+        form = ProductEditForm(instance=Product.objects.filter(id=id).first())
+    return render(request, 'product_edit.html', 
+                    {'form': form})
+
+@login_required
 def order_detail(request, id):
     o = Order.objects.filter(id=id).first()
     ois = OrderItem.objects.filter(order_id=id)
@@ -112,16 +128,13 @@ def account_detail(request):
 @login_required
 def change_password(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = PasswordChangeCustomForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('change_password')
-        else:
-            messages.error(request, 'Please correct the error below.')
+            return redirect('account_detail')
     else:
-        form = PasswordChangeForm(request.user)
+        form = PasswordChangeCustomForm(request.user)
     return render(request, 'change_password.html', {
         'form': form
     })
