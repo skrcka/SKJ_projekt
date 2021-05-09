@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Welcome {{ user.first_name }}</h1>
+<p>In <b>Account</b> page you can change your info and password</p>
+<h2>How to make an order: </h2>
+<ol>
+    <li>In <b>Store</b> add items to your cart.</li>
+    <li>In your <b>Cart</b> change how many items of each kind you want</li>
+    <li>Save your cart</li>
+    <li>Click make order</li>
+    <li>Add your details</li>
+    <li>Enjoy</li>
+</ol>
+<p>You can find your order history in <b>My orders</b> page</p>
+{% endblock %}

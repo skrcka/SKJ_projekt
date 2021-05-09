@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Order {{ oid }} completed sucessfuly</h1>
+<p>You will receive additional info soon in an email</p>
+<p>You can find your order details here: <a class="btn btn-primary" href="{% url 'order_detail' oid %}">Go to detail</a></p>
+{% endblock %}

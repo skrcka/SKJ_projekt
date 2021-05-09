@@ -27,6 +27,11 @@ def index(request):
     return render(request, 'index.html', 
                     {'products': products})
 
+def welcome(request):
+    user = request.user
+    return render(request, 'welcome.html', 
+                    {'user': user})
+
 def sign_up(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -79,7 +84,7 @@ def order_new(request):
                 orderitem.order = order
                 orderitem.save()
             cartitems.delete()
-            return redirect('/shop')
+            return redirect(f'/shop/order_complete/{oid}')
     form = OrderForm()
     return render(request, 'order_new.html', {'form': form, 'cart': cart})
 
@@ -113,6 +118,11 @@ def order_detail(request, id):
     ois = OrderItem.objects.filter(order_id=id)
     return render(request, 'order_detail.html', 
                     {'o': o, 'ois': ois})
+
+@login_required
+def order_complete(request, id):
+    return render(request, 'order_complete.html', 
+                    {'oid': id})
 
 @login_required
 def account_detail(request):
