@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
     <h1>{{ p.name }}</h1>
-    <p>{{ p.price }} Kc</p>
+    <img src="{{ p.image_url }}" height="300">
+    <p>Price: {{ p.price }} Kc</p>
+    <p>In stock: {{ p.stock }}</p>
+    {% if user.is_staff %}
     <p><a class="btn btn-primary" href="{% url 'product_edit' p.id %}">Edit</a></p>
-{% endblock %}
+    {% endif %}
+    {% endblock %}

@@ -26,7 +26,8 @@ SECRET_KEY = 'zvz7*k5%5i!rz*x%o58=lv5!@fcxx7)=q8yffn=(u3@1a0%*qa'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+LOGIN_URL = '/shop/login'
+LOGOUT_REDIRECT_URL= '/shop/index'
 
 # Application definition
 

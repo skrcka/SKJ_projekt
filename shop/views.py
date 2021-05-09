@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
@@ -88,10 +89,11 @@ def logout_view(request):
 
 def product(request, id):
     p = Product.objects.filter(id=id).first()
+    user = request.user
     return render(request, 'product.html', 
-                    {'p': p})
+                    {'p': p, 'user': user})
 
-@login_required
+@staff_member_required(login_url='/shop/login')
 def product_edit(request, id):
     if request.method == 'POST':
         form = ProductEditForm(request.POST)
@@ -99,7 +101,7 @@ def product_edit(request, id):
             item = form.save(commit=False)
             item.id = id
             item.save()
-            return redirect(f'/shop/product/{id}/edit')
+            return redirect(f'/shop/product/{id}')
     else:
         form = ProductEditForm(instance=Product.objects.filter(id=id).first())
     return render(request, 'product_edit.html', 
@@ -135,8 +137,9 @@ def change_password(request):
             return redirect('account_detail')
     else:
         form = PasswordChangeCustomForm(request.user)
+    user = request.user
     return render(request, 'change_password.html', {
-        'form': form
+        'form': form, 'user': user
     })
 
 @login_required
